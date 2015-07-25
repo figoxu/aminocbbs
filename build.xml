@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<project name="amino" default="compile-tests" basedir=".">
+
+	<property name="build.dir" location="build" />
+	<property name="build.prod.dir" location="${build.dir}/main" />
+	<property name="build.test.dir" location="${build.dir}/test" />
+	<property name="doc.dir" location="doc" />
+	<property name="src.dir" location="src/main/java" />
+	<property name="test.dir" location="src/test/java" />
+	<property name="lib.dir" location="lib" />
+
+	<path id="project.classpath">
+		<pathelement location="${build.prod.dir}" />
+	</path>
+
+	<path id="project.test.classpath">
+		<path refid="project.classpath" />
+		<pathelement location="${build.test.dir}" />
+		<fileset dir="${lib.dir}">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+	<target name="prepare">
+		<mkdir dir="${build.prod.dir}" />
+		<mkdir dir="${build.test.dir}" />
+	</target>
+
+
+	<target name="compile" depends="prepare">
+		<javac srcdir="${src.dir}" destdir="${build.prod.dir}">
+			<classpath refid="project.classpath" />
+		</javac>
+	</target>
+
+	<target name="compile-tests" depends="compile">
+		<javac srcdir="${test.dir}" destdir="${build.test.dir}">
+			<classpath refid="project.test.classpath" />
+		</javac>
+	</target>
+
+	<target name="test" depends="compile-tests">
+		<junit haltonfailure="true">
+			<classpath refid="project.test.classpath" />
+			<formatter type="brief" usefile="false" />
+			<batchtest>
+				<fileset dir="${build.test.dir}" includes="**/AllTests.class" />
+			</batchtest>
+		</junit>
+	</target>
+
+	<target name="clean">
+		<delete dir="${build.dir}" />
+	</target>
+
+	<target name="clean-doc">
+		<delete dir="${doc.dir}" />
+	</target>
+
+	<target name="javadoc" description="Generate Java documentation">
+		<mkdir dir="${doc.dir}" />
+		<javadoc destdir="${doc.dir}" verbose="true">
+			<fileset dir="${src.dir}">
+				<include name="**/*.java" />
+			</fileset>
+			<fileset dir="${test.dir}">
+				<include name="**/*.java" />
+			</fileset>
+		</javadoc>
+	</target>
+</project>
